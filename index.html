@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intermission</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────── */
+    :root {
+      --bg-base:    #0A0A09;
+      --bg-raised:  #111110;
+      --bg-high:    #1A1A18;
+      --bg-subtle:  #1F1F1D;
+
+      --border-dim:    rgba(255,255,255,.06);
+      --border-soft:   rgba(255,255,255,.10);
+      --border-medium: rgba(255,255,255,.16);
+
+      --text-primary:   #F2F0EB;
+      --text-secondary: #8A8780;
+      --text-tertiary:  #4A4845;
+
+      --accent:       #C8A97A;
+      --accent-dim:   rgba(200,169,122,.12);
+      --accent-glow:  rgba(200,169,122,.06);
+
+      --state-breath:  rgba(120,160,200,.08);
+      --state-eye:     rgba(180,220,180,.08);
+      --state-quiet:   rgba(200,180,240,.06);
+      --state-stretch: rgba(220,180,140,.08);
+
+      --font-hero:    clamp(2.8rem,6vw,5rem);
+      --font-display: clamp(1.8rem,4vw,3rem);
+      --font-title:   clamp(1.2rem,2.5vw,1.6rem);
+      --font-body:    1rem;
+      --font-small:   .875rem;
+      --font-label:   .75rem;
+      --font-timer:   clamp(3.5rem,10vw,7rem);
+      --font-micro:   .6875rem;
+
+      --sp-xs:  4px;
+      --sp-sm:  8px;
+      --sp-md:  16px;
+      --sp-lg:  24px;
+      --sp-xl:  48px;
+      --sp-2xl: 80px;
+    }
+
+    /* ─── RESET & BASE ──────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-size: var(--font-body);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ─── FOCUS STYLES ──────────────────────────────── */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ─── LAYOUT ────────────────────────────────────── */
+    #app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--sp-lg) var(--sp-lg) 80px;
+      position: relative;
+    }
+
+    .state-panel {
+      width: 100%;
+      max-width: 560px;
+      transition: opacity 260ms ease, transform 260ms ease;
+    }
+
+    /* ─── TYPOGRAPHY ────────────────────────────────── */
+    .text-hero     { font-size: var(--font-hero);    font-weight: 300; letter-spacing: -.04em; }
+    .text-display  { font-size: var(--font-display); font-weight: 300; letter-spacing: -.03em; }
+    .text-title    { font-size: var(--font-title);   font-weight: 400; letter-spacing: -.02em; }
+    .text-body     { font-size: var(--font-body);    font-weight: 400; line-height: 1.7; }
+    .text-small    { font-size: var(--font-small);   color: var(--text-secondary); }
+    .text-label    { font-size: var(--font-label);   font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-tertiary); }
+    .text-timer    { font-size: var(--font-timer);   font-weight: 300; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+    .text-micro    { font-size: var(--font-micro);   color: var(--text-tertiary); }
+    .text-center   { text-align: center; }
+    .text-accent   { color: var(--accent); }
+    .text-primary  { color: var(--text-primary); }
+    .text-secondary{ color: var(--text-secondary); }
+    .text-tertiary { color: var(--text-tertiary); }
+
+    /* ─── CARDS ─────────────────────────────────────── */
+    .card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-dim);
+      border-radius: 16px;
+      padding: var(--sp-lg);
+      transition: border-color 200ms ease, background 200ms ease, transform 180ms ease;
+    }
+
+    .card-interactive {
+      cursor: pointer;
+    }
+
+    .card-interactive:hover {
+      border-color: var(--border-soft);
+      background: var(--bg-subtle);
+      transform: translateY(-2px);
+    }
+
+    .card-interactive:active {
+      transform: scale(.98);
+    }
+
+    .card.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* ─── BUTTONS ────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-sm);
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: opacity 200ms ease, transform 150ms ease, border-color 200ms ease, color 200ms ease, background 200ms ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg-base);
+      border: 1px solid transparent;
+    }
+
+    .btn-primary:hover {
+      opacity: .88;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: scale(.97);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--border-medium);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:active {
+      transform: scale(.97);
+    }
+
+    .btn-secondary.active {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: .8125rem;
+      font-weight: 400;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      border-radius: 6px;
+      transition: color 200ms ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--text-secondary);
+    }
+
+    .btn-full { width: 100%; }
+    .btn-max280 { max-width: 280px; width: 100%; }
+
+    /* ─── DIVIDER ────────────────────────────────────── */
+    .divider {
+      width: 40px;
+      height: 1px;
+      background: var(--border-dim);
+    }
+
+    /* ─── STAGGER FADE IN ────────────────────────────── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeInUp 400ms ease forwards;
+    }
+
+    /* ─── STATE: WELCOME ─────────────────────────────── */
+    #state-WELCOME {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .welcome-name {
+      font-size: var(--font-display);
+      font-weight: 300;
+      letter-spacing: -.04em;
+      color: var(--text-primary);
+      animation: fadeInUp 400ms ease forwards;
+    }
+
+    .welcome-tagline {
+      font-size: var(--font-small);
+      color: var(--text-tertiary);
+      margin-top: 12px;
+      animation: fadeInUp 400ms 80ms ease both;
+    }
+
+    .welcome-divider {
+      margin-top: var(--sp-xl);
+      animation: fadeInUp 400ms 160ms ease both;
+    }
+
+    .mode-cards {
+      margin-top: var(--sp-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      width: 100%;
+      animation: fadeInUp 400ms 240ms ease both;
+    }
+
+    .mode-card {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-md);
+      padding: 16px 20px;
+    }
+
+    .mode-icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mode-card-body {
+      flex: 1;
+    }
+
+    .mode-card-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      letter-spacing: -.01em;
+    }
+
+    .mode-card-sub {
+      font-size: .8125rem;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    .mode-card-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .mode-card-duration {
+      font-size: .75rem;
+      color: var(--text-tertiary);
+      letter-spacing: .02em;
+    }
+
+    .mode-card-arrow {
+      color: var(--text-tertiary);
+      font-size: .875rem;
+      transition: transform 180ms ease, color 180ms ease;
+    }
+
+    .mode-card:hover .mode-card-arrow {
+      transform: translateX(2px);
+      color: var(--text-secondary);
+    }
+
+    .mode-cards:has(.mode-card:hover) .mode-card:not(:hover) {
+      opacity: .55;
+      transition: opacity 200ms ease;
+    }
+
+    .welcome-hint {
+      margin-top: 32px;
+      width: 100%;
+      text-align: center;
+      animation: fadeInUp 400ms 320ms ease both;
+    }
+
+    /* ─── STATE: MODE_SELECT ─────────────────────────── */
+    #state-MODE_SELECT {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .mode-select-header {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--sp-lg);
+    }
+
+    .mode-detail-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .duration-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--sp-sm);
+      margin-top: var(--sp-md);
+    }
+
+    .what-to-expect {
+      margin-top: var(--sp-lg);
+    }
+
+    .expect-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      padding-left: 16px;
+      margin-top: var(--sp-md);
+    }
+
+    .expect-item {
+      font-size: var(--font-small);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      position: relative;
+    }
+
+    .expect-item::before {
+      content: '';
+      position: absolute;
+      left: -12px;
+      top: 10px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+    }
+
+    .mode-select-start {
+      margin-top: 32px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ─── STATE: ACTIVE ──────────────────────────────── */
+    #state-ACTIVE {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 560px;
+      position: relative;
+    }
+
+    .active-session-id {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+      text-align: center;
+      letter-spacing: .04em;
+    }
+
+    .active-main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+      width: 100%;
+      position: relative;
+    }
+
+    .active-timer-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 40px;
+      width: 100%;
+    }
+
+    #timer-display {
+      font-size: var(--font-timer);
+      font-weight: 300;
+      letter-spacing: -.05em;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-secondary);
+      line-height: 1;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 2px;
+      background: var(--border-dim);
+      border-radius: 1px;
+      margin-top: var(--sp-md);
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 1px;
+      width: 100%;
+      transition: width 1s linear;
+    }
+
+    .active-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-md);
+      margin-top: var(--sp-lg);
+    }
+
+    /* PAUSE OVERLAY */
+    .pause-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+      z-index: 2;
+    }
+
+    .pause-overlay.visible {
+      opacity: 1;
+    }
+
+    .pause-label {
+      font-size: var(--font-label);
+      letter-spacing: .1em;
+      color: var(--text-secondary);
+    }
+
+    /* ─── MODE CONTENT: QUIET ────────────────────────── */
+    .quiet-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 160px;
+      position: relative;
+    }
+
+    .quiet-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      animation: quietPulse 8s ease-in-out infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes quietPulse {
+      0%, 100% { opacity: 0; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.08); }
+    }
+
+    #quiet-phrase {
+      font-size: var(--font-title);
+      font-weight: 300;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 360px;
+      transition: opacity 400ms ease;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* ─── MODE CONTENT: EYE ──────────────────────────── */
+    .eye-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-md);
+      min-height: 160px;
+    }
+
+    .eye-svg-wrap {
+      position: relative;
+      width: 64px;
+      height: 48px;
+    }
+
+    #eye-svg {
+      width: 64px;
+      height: 48px;
+    }
+
+    .eye-lid {
+      transform-origin: center 50%;
+      transition: transform 300ms ease;
+    }
+
+    @keyframes slowBlink {
+      0%, 80%, 100% { transform: scaleY(1); }
+      88% { transform: scaleY(0.08); }
+    }
+
+    .eye-blinking .eye-lid {
+      animation: slowBlink 4s ease-in-out infinite;
+    }
+
+    .eye-step-text {
+      text-align: center;
+    }
+
+    .eye-step-title {
+      font-size: var(--font-title);
+      font-weight: 300;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .eye-step-sub {
+      font-size: var(--font-small);
+      color: var(--text-tertiary);
+    }
+
+    /* ─── MODE CONTENT: BREATH ───────────────────────── */
+    .breath-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-lg);
+      min-height: 200px;
+    }
+
+    #breath-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 1px solid var(--accent);
+      background: transparent;
+      transform-origin: center;
+    }
+
+    @keyframes breatheIn {
+      0%   { transform: scale(1); background: transparent; }
+      100% { transform: scale(2); background: var(--accent-dim); }
+    }
+    @keyframes hold {
+      0%, 100% { transform: scale(2); background: var(--accent-dim); }
+    }
+    @keyframes breatheOut {
+      0%   { transform: scale(2); background: var(--accent-dim); }
+      100% { transform: scale(1); background: transparent; }
+    }
+
+    .breath-labels {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #breath-label {
+      font-size: var(--font-small);
+      color: var(--text-secondary);
+      text-align: center;
+      min-height: 1.5em;
+    }
+
+    #breath-cycle-count {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+      text-align: center;
+    }
+
+    /* ─── MODE CONTENT: STRETCH ──────────────────────── */
+    .stretch-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-lg);
+      min-height: 200px;
+    }
+
+    #stretch-figure {
+      width: 64px;
+      height: 80px;
+      opacity: 1;
+      transition: opacity 600ms ease;
+    }
+
+    #stretch-figure.fading {
+      opacity: 0;
+    }
+
+    .stretch-text-wrap {
+      text-align: center;
+      transition: opacity 600ms ease;
+    }
+
+    .stretch-text-wrap.fading {
+      opacity: 0;
+    }
+
+    #stretch-prompt {
+      font-size: var(--font-title);
+      font-weight: 300;
+      color: var(--text-secondary);
+      text-align: center;
+      max-width: 360px;
+    }
+
+    /* ─── MODE AMBIENT ───────────────────────────────── */
+    .active-mode-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      transition: background 1s ease;
+    }
+
+    /* ─── STATE: COMPLETE ────────────────────────────── */
+    #state-COMPLETE {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+    }
+
+    .check-container {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .check-circle {
+      position: absolute;
+      inset: 0;
+      width: 48px;
+      height: 48px;
+    }
+
+    .check-path {
+      stroke-dasharray: 30;
+      stroke-dashoffset: 30;
+      transition: stroke-dashoffset 500ms ease-out;
+    }
+
+    .check-path.drawn {
+      stroke-dashoffset: 0;
+    }
+
+    .check-ring {
+      stroke-dasharray: 150.8;
+      stroke-dashoffset: 150.8;
+      transition: stroke-dashoffset 600ms ease-out 50ms;
+    }
+
+    .check-ring.drawn {
+      stroke-dashoffset: 0;
+    }
+
+    .complete-message {
+      font-size: var(--font-title);
+      font-weight: 300;
+      color: var(--text-secondary);
+      margin-top: var(--sp-md);
+      max-width: 380px;
+    }
+
+    .complete-recap {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+      margin-top: var(--sp-sm);
+      letter-spacing: .04em;
+    }
+
+    .complete-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-sm);
+      margin-top: 40px;
+    }
+
+    /* ─── STATE: REENTRY ─────────────────────────────── */
+    #state-REENTRY {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .reentry-intention-area {
+      transition: opacity 300ms ease;
+    }
+
+    .reentry-intention-area.fading {
+      opacity: 0;
+    }
+
+    .intention-input {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-soft);
+      border-radius: 10px;
+      padding: 14px 16px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 1rem;
+      width: 100%;
+      outline: none;
+      transition: border-color 200ms ease;
+      margin-top: var(--sp-lg);
+    }
+
+    .intention-input:focus {
+      border-color: var(--accent);
+    }
+
+    .intention-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    #intention-confirmation {
+      display: none;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      min-height: 80px;
+      justify-content: center;
+    }
+
+    .intention-final-text {
+      font-size: var(--font-title);
+      font-weight: 300;
+      color: var(--accent);
+    }
+
+    .intention-final-sub {
+      font-size: var(--font-small);
+      color: var(--text-tertiary);
+    }
+
+    /* ─── HISTORY STRIP ──────────────────────────────── */
+    #history-strip {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-base);
+      border-top: 1px solid var(--border-dim);
+      max-height: 44px;
+      overflow: hidden;
+      transition: max-height 300ms ease;
+      z-index: 100;
+      cursor: pointer;
+    }
+
+    #history-strip.expanded {
+      max-height: 130px;
+      cursor: default;
+    }
+
+    .history-collapsed {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--sp-lg);
+      height: 44px;
+    }
+
+    .history-dots {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-quiet   { background: rgba(200,180,240,.7); }
+    .dot-eye     { background: rgba(140,200,140,.7); }
+    .dot-breath  { background: rgba(120,160,200,.7); }
+    .dot-stretch { background: rgba(200,160,100,.7); }
+
+    .history-count {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+    }
+
+    .history-expanded {
+      display: flex;
+      gap: var(--sp-sm);
+      padding: 8px var(--sp-lg) var(--sp-md);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .history-expanded::-webkit-scrollbar { display: none; }
+
+    .history-mini-card {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-dim);
+      border-radius: 10px;
+      padding: 8px 12px;
+      min-width: 100px;
+      max-width: 120px;
+      flex-shrink: 0;
+    }
+
+    .history-mini-mode {
+      font-size: .6875rem;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .history-mini-duration {
+      font-size: .75rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .history-mini-time {
+      font-size: .625rem;
+      color: var(--text-tertiary);
+      margin-top: 2px;
+    }
+
+    .history-mini-intention {
+      font-size: .625rem;
+      color: var(--text-tertiary);
+      font-style: italic;
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 96px;
+    }
+
+    /* ─── EXIT MODAL ─────────────────────────────────── */
+    #exit-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: var(--sp-lg);
+    }
+
+    .exit-modal-inner {
+      background: var(--bg-raised);
+      border: 1px solid var(--border-soft);
+      border-radius: 20px;
+      padding: var(--sp-xl) var(--sp-lg);
+      max-width: 340px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-lg);
+      text-align: center;
+    }
+
+    .exit-modal-title {
+      font-size: var(--font-title);
+      font-weight: 400;
+      color: var(--text-primary);
+    }
+
+    .exit-modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-sm);
+      align-items: center;
+    }
+
+    /* ─── SPACING UTILS ──────────────────────────────── */
+    .mt-sm  { margin-top: var(--sp-sm); }
+    .mt-md  { margin-top: var(--sp-md); }
+    .mt-lg  { margin-top: var(--sp-lg); }
+    .mt-xl  { margin-top: var(--sp-xl); }
+    .mt-32  { margin-top: 32px; }
+    .mt-40  { margin-top: 40px; }
+    .mt-8   { margin-top: 8px; }
+    .mt-12  { margin-top: 12px; }
+
+    /* ─── SCROLLBAR ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 2px; }
+
+    /* ─── ACTIVE MODE GLOW COLORS ────────────────────── */
+    .glow-quiet   { background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(200,180,240,.04) 0%, transparent 70%); }
+    .glow-eye     { background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(140,200,140,.04) 0%, transparent 70%); }
+    .glow-breath  { background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(120,160,200,.04) 0%, transparent 70%); }
+    .glow-stretch { background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(200,160,100,.04) 0%, transparent 70%); }
+
+    /* ─── ACTIVITY DETECTION ────────────────────────── */
+    .activity-note {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+      text-align: center;
+      margin-top: var(--sp-sm);
+      letter-spacing: .03em;
+      opacity: .8;
+      transition: opacity 300ms ease;
+    }
+
+    .activity-toast {
+      font-size: var(--font-micro);
+      color: var(--text-tertiary);
+      text-align: center;
+      height: 16px;
+      margin-top: var(--sp-sm);
+      opacity: 0;
+      transition: opacity 400ms ease;
+      letter-spacing: .03em;
+      pointer-events: none;
+    }
+
+    .activity-toast.visible {
+      opacity: 1;
+    }
+
+    /* ─── MOBILE ─────────────────────────────────────── */
+    @media (max-width: 480px) {
+      #content {
+        padding: var(--sp-lg) var(--sp-md) 80px;
+      }
+      .active-controls {
+        gap: var(--sp-sm);
+      }
+      .btn {
+        padding: 12px 20px;
+        font-size: .8125rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div class="active-mode-glow" id="mode-glow"></div>
+  <main id="content" role="main" aria-label="Intermission app">
+
+    <!-- ══ STATE 1: WELCOME ══════════════════════════════ -->
+    <div id="state-WELCOME" class="state-panel">
+      <h1 class="welcome-name">Intermission</h1>
+      <p class="welcome-tagline">A short pause between what was and what's next.</p>
+
+      <div class="divider welcome-divider"></div>
+
+      <div class="mode-cards" role="list">
+
+        <!-- Quiet Pause -->
+        <div class="card card-interactive mode-card" role="listitem" data-mode="quiet"
+             tabindex="0" aria-label="Quiet Pause, 2–5 minutes"
+             onclick="selectMode('quiet')" onkeydown="if(event.key==='Enter'||event.key===' ')selectMode('quiet')">
+          <div class="mode-icon-wrap" style="background:var(--state-quiet)" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <line x1="4" y1="7" x2="16" y2="7" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="4" y1="10" x2="16" y2="10" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="4" y1="13" x2="16" y2="13" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="mode-card-body">
+            <div class="mode-card-title">Quiet Pause</div>
+            <div class="mode-card-sub">Step away. Do nothing.</div>
+          </div>
+          <div class="mode-card-meta">
+            <span class="mode-card-duration">2–5 min</span>
+            <span class="mode-card-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Eye Reset -->
+        <div class="card card-interactive mode-card" role="listitem" data-mode="eye"
+             tabindex="0" aria-label="Eye Reset, 20 seconds to 2 minutes"
+             onclick="selectMode('eye')" onkeydown="if(event.key==='Enter'||event.key===' ')selectMode('eye')">
+          <div class="mode-icon-wrap" style="background:var(--state-eye)" aria-hidden="true">
+            <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+              <path d="M1 7 C4 2, 16 2, 19 7 C16 12, 4 12, 1 7Z" stroke="rgba(140,200,140,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="7" r="2.5" stroke="rgba(140,200,140,.7)" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="mode-card-body">
+            <div class="mode-card-title">Eye Reset</div>
+            <div class="mode-card-sub">Rest your focus. Look somewhere else.</div>
+          </div>
+          <div class="mode-card-meta">
+            <span class="mode-card-duration">20 sec–2 min</span>
+            <span class="mode-card-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Breathing Reset -->
+        <div class="card card-interactive mode-card" role="listitem" data-mode="breath"
+             tabindex="0" aria-label="Breathing Reset, 2–4 minutes"
+             onclick="selectMode('breath')" onkeydown="if(event.key==='Enter'||event.key===' ')selectMode('breath')">
+          <div class="mode-icon-wrap" style="background:var(--state-breath)" aria-hidden="true">
+            <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+              <path d="M1 10 Q5 2, 10 7 Q15 12, 19 4" stroke="rgba(120,160,200,.7)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="mode-card-body">
+            <div class="mode-card-title">Breathing Reset</div>
+            <div class="mode-card-sub">Slow, quiet, deliberate.</div>
+          </div>
+          <div class="mode-card-meta">
+            <span class="mode-card-duration">2–4 min</span>
+            <span class="mode-card-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- Stand & Stretch -->
+        <div class="card card-interactive mode-card" role="listitem" data-mode="stretch"
+             tabindex="0" aria-label="Stand and Stretch, 3–5 minutes"
+             onclick="selectMode('stretch')" onkeydown="if(event.key==='Enter'||event.key===' ')selectMode('stretch')">
+          <div class="mode-icon-wrap" style="background:var(--state-stretch)" aria-hidden="true">
+            <svg width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true">
+              <line x1="8" y1="18" x2="8" y2="6" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="4" y1="10" x2="12" y2="10" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="8" y1="6" x2="5" y2="2" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="8" y1="6" x2="11" y2="2" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="mode-card-body">
+            <div class="mode-card-title">Stand &amp; Stretch</div>
+            <div class="mode-card-sub">Move. Your body was waiting for this.</div>
+          </div>
+          <div class="mode-card-meta">
+            <span class="mode-card-duration">3–5 min</span>
+            <span class="mode-card-arrow">→</span>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="text-micro welcome-hint">Usually 2–5 minutes is enough.</p>
+    </div>
+
+    <!-- ══ STATE 2: MODE_SELECT ══════════════════════════ -->
+    <div id="state-MODE_SELECT" class="state-panel hidden">
+      <button class="btn-ghost" onclick="setState('WELCOME')" aria-label="Go back to mode selection">← Back</button>
+
+      <div class="mode-select-header mt-lg">
+        <div id="ms-icon" class="mode-detail-icon"></div>
+        <div>
+          <h2 id="ms-name" class="text-title" style="font-weight:300;letter-spacing:-.02em;color:var(--text-primary)"></h2>
+          <p id="ms-desc" class="text-small mt-sm"></p>
+        </div>
+      </div>
+
+      <div class="mt-32">
+        <p class="text-label">How long?</p>
+        <div class="duration-pills" id="duration-pills" role="group" aria-label="Duration options"></div>
+      </div>
+
+      <div class="card what-to-expect mt-lg">
+        <p class="text-label">What to expect</p>
+        <ul class="expect-list" id="expect-list" role="list"></ul>
+      </div>
+
+      <div class="mode-select-start">
+        <button class="btn btn-primary btn-max280" id="btn-begin" onclick="beginSession()" aria-label="Begin reset session">Begin Reset</button>
+      </div>
+    </div>
+
+    <!-- ══ STATE 3: ACTIVE ═══════════════════════════════ -->
+    <div id="state-ACTIVE" class="state-panel hidden" style="position:relative;">
+      <p class="active-session-id" id="active-session-id" aria-label="Current session"></p>
+      <p id="activity-note" class="activity-note hidden"></p>
+
+      <div class="active-main-content" id="active-main-content">
+
+        <!-- QUIET content -->
+        <div id="mode-quiet" class="quiet-content hidden">
+          <div class="quiet-glow" aria-hidden="true"></div>
+          <p id="quiet-phrase" role="status" aria-live="polite">Step away from the screen.</p>
+        </div>
+
+        <!-- EYE content -->
+        <div id="mode-eye" class="eye-content hidden">
+          <div class="eye-svg-wrap" aria-hidden="true">
+            <svg id="eye-svg" viewBox="0 0 64 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <g class="eye-lid" style="transform-origin:32px 24px">
+                <path d="M4 24 C12 8, 52 8, 60 24 C52 40, 12 40, 4 24Z" stroke="rgba(140,200,140,.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <circle cx="32" cy="24" r="8" stroke="rgba(140,200,140,.5)" stroke-width="1.5"/>
+              <circle cx="32" cy="24" r="3" fill="rgba(140,200,140,.3)"/>
+            </svg>
+          </div>
+          <div class="eye-step-text" aria-live="polite">
+            <p id="eye-step-title" class="eye-step-title">Look away from this screen.</p>
+            <p id="eye-step-sub" class="eye-step-sub">Find something at least 6 metres away.</p>
+          </div>
+        </div>
+
+        <!-- BREATH content -->
+        <div id="mode-breath" class="breath-content hidden">
+          <div id="breath-circle" aria-hidden="true"></div>
+          <div class="breath-labels">
+            <p id="breath-label" role="status" aria-live="polite">Breathe in</p>
+            <p id="breath-cycle-count" class="text-micro"></p>
+          </div>
+        </div>
+
+        <!-- STRETCH content -->
+        <div id="mode-stretch" class="stretch-content hidden">
+          <svg id="stretch-figure" viewBox="0 0 64 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- default standing figure, overridden by JS -->
+          </svg>
+          <div class="stretch-text-wrap">
+            <p id="stretch-prompt" class="text-title" style="font-weight:300;color:var(--text-secondary)"></p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Pause overlay -->
+      <div class="pause-overlay" id="pause-overlay" aria-hidden="true">
+        <span class="pause-label">Paused</span>
+      </div>
+
+      <div class="active-timer-area">
+        <div id="timer-display" aria-live="polite" aria-label="Time remaining" role="timer">0:00</div>
+        <div class="progress-bar-wrap" aria-hidden="true">
+          <div id="progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="activity-toast" class="activity-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+      <div class="active-controls">
+        <button class="btn btn-ghost" id="btn-pause" aria-pressed="false" onclick="togglePause()">Pause</button>
+        <button class="btn btn-ghost" onclick="promptExit()" aria-label="Exit this session">Exit session</button>
+      </div>
+    </div>
+
+    <!-- ══ STATE 4: COMPLETE ═════════════════════════════ -->
+    <div id="state-COMPLETE" class="state-panel hidden" style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+      <div class="check-container">
+        <svg class="check-circle" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <circle class="check-ring" cx="24" cy="24" r="22" stroke="var(--border-soft)" stroke-width="1"/>
+          <path class="check-path" d="M14 24L21 31L34 16" stroke="var(--accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p id="complete-message" class="complete-message"></p>
+      <p id="complete-recap" class="complete-recap"></p>
+      <div class="complete-actions">
+        <button class="btn btn-primary" onclick="setState('REENTRY')" aria-label="Prepare to return to work">Prepare to return →</button>
+        <button class="btn btn-ghost" onclick="resetAndGoHome()" aria-label="Start another session">Start another</button>
+      </div>
+    </div>
+
+    <!-- ══ STATE 5: REENTRY ══════════════════════════════ -->
+    <div id="state-REENTRY" class="state-panel hidden">
+      <h2 class="text-title" style="font-weight:300;color:var(--text-primary)">Before you return.</h2>
+      <p class="text-small mt-md">"What matters most in the next session?"</p>
+
+      <div id="reentry-intention-area" class="reentry-intention-area mt-lg">
+        <input
+          type="text"
+          id="intention-input"
+          class="intention-input"
+          placeholder="One thing. Not a list."
+          maxlength="140"
+          aria-label="What matters most in the next session"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div style="margin-top:var(--sp-lg);display:flex;justify-content:flex-start;">
+          <button class="btn btn-primary" onclick="confirmIntention()" aria-label="Return to work">Return to work</button>
+        </div>
+      </div>
+
+      <div id="intention-confirmation" style="display:none;flex-direction:column;gap:var(--sp-sm);padding-top:var(--sp-md);">
+        <p id="intention-final-text" class="intention-final-text"></p>
+        <p id="intention-final-sub" class="intention-final-sub"></p>
+        <button class="btn-ghost" style="margin-top:var(--sp-md);padding-left:0;color:var(--text-tertiary);font-size:.75rem;background:transparent;border:none;cursor:pointer;text-align:left;"
+                onclick="setState('HISTORY_STRIP_OPEN')" aria-label="View session history">Open session history</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- HISTORY STRIP -->
+  <aside id="history-strip" class="hidden" role="complementary" aria-label="Session history">
+    <div class="history-collapsed" onclick="toggleHistory(event)" role="button" tabindex="0"
+         aria-expanded="false" id="history-toggle" aria-label="Toggle session history"
+         onkeydown="if(event.key==='Enter'||event.key===' ')toggleHistory(event)">
+      <div class="history-dots" id="history-dots"></div>
+      <span class="history-count" id="history-count"></span>
+    </div>
+    <div class="history-expanded" id="history-expanded" aria-hidden="true"></div>
+  </aside>
+</div>
+
+<!-- EXIT MODAL -->
+<div id="exit-modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="exit-modal-title">
+  <div class="exit-modal-inner">
+    <p class="exit-modal-title" id="exit-modal-title">End this session early?</p>
+    <div class="exit-modal-actions">
+      <button class="btn btn-primary btn-max280" onclick="dismissExitModal()" aria-label="Keep going with this session">Keep going</button>
+      <button class="btn btn-ghost" onclick="endSessionEarly()" aria-label="End this session">End session</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── STATE MACHINE ───────────────────────────────────
+  let appState = 'WELCOME'
+
+  function setState(newState, data = {}) {
+    if (newState === 'HISTORY_STRIP_OPEN') {
+      expandHistoryStrip()
+      return
+    }
+
+    const current = document.getElementById('state-' + appState)
+    const next = document.getElementById('state-' + newState)
+    if (!next) return
+
+    current.style.opacity = '0'
+    current.style.transform = 'translateY(-8px)'
+
+    setTimeout(() => {
+      current.classList.add('hidden')
+      current.style.opacity = ''
+      current.style.transform = ''
+
+      next.classList.remove('hidden')
+      next.style.opacity = '0'
+      next.style.transform = 'translateY(12px)'
+
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          next.style.opacity = '1'
+          next.style.transform = 'translateY(0)'
+        })
+      })
+
+      appState = newState
+      document.querySelector('#content').setAttribute('aria-label', 'Intermission — ' + newState.toLowerCase().replace('_', ' '))
+
+      if (data.onEnter) data.onEnter()
+    }, 260)
+  }
+
+  // ─── SESSION STATE ───────────────────────────────────
+  let session = {
+    mode: null,
+    duration: null,
+    elapsed: 0,
+    history: [],
+    currentIntention: '',
+    breathCycles: 0
+  }
+
+  // ─── MODE CONFIG ─────────────────────────────────────
+  const MODES = {
+    quiet: {
+      name: 'Quiet Pause',
+      desc: 'Step back from effort. Let your mind settle without agenda.',
+      iconBg: 'var(--state-quiet)',
+      durations: [{label:'2 min',secs:120},{label:'5 min',secs:300},{label:'10 min',secs:600}],
+      expect: [
+        'Find a comfortable position away from your screen.',
+        'Let thoughts come and go without following them.',
+        'Nothing is required of you right now.',
+        'The timer will signal when to return.'
+      ]
+    },
+    eye: {
+      name: 'Eye Reset',
+      desc: 'Rest your focal muscles. Your eyes have been working hard.',
+      iconBg: 'var(--state-eye)',
+      durations: [{label:'20 sec',secs:20},{label:'2 min',secs:120},{label:'5 min',secs:300}],
+      expect: [
+        'Look at something at least 6 metres away.',
+        'Blink slowly several times.',
+        'Let your eyes relax out of focus.',
+        'The timer will guide your return.'
+      ]
+    },
+    breath: {
+      name: 'Breathing Reset',
+      desc: 'Slow, deliberate breathing settles your nervous system quietly.',
+      iconBg: 'var(--state-breath)',
+      durations: [{label:'2 min',secs:120},{label:'4 min',secs:240},{label:'6 min',secs:360}],
+      expect: [
+        'You\'ll follow a gentle inhale–hold–exhale pattern.',
+        'Inhale for 4 seconds, hold briefly, exhale for 6.',
+        'Keep your jaw and shoulders soft.',
+        'You don\'t need to count — just follow the circle.'
+      ]
+    },
+    stretch: {
+      name: 'Stand & Stretch',
+      desc: 'Your body has been still. Give it a few minutes to move.',
+      iconBg: 'var(--state-stretch)',
+      durations: [{label:'3 min',secs:180},{label:'5 min',secs:300},{label:'8 min',secs:480}],
+      expect: [
+        'You\'ll be guided through simple movement prompts.',
+        'Move at your own pace — these are suggestions.',
+        'No equipment or space needed.',
+        'Stand up before you begin.'
+      ]
+    }
+  }
+
+  // ─── ACTIVITY DETECTION CONFIG ───────────────────────
+  // Only Quiet Pause is a stillness mode — activity directly
+  // contradicts its purpose, so this is where resets make sense.
+  // Breathing, Eye Reset, and Stretch are guided active modes:
+  // activity there is expected (you're moving, looking away, breathing).
+  const ACTIVITY_CONFIG = {
+    quiet: {
+      resetsOnActivity: true,
+      movementThreshold: 30,   // px — ignores cursor jitter below this
+      gracePeriodMs: 2500,     // ms after start/reset before detection arms
+      note: 'Stillness required. Activity will restart this session.'
+    }
+    // eye, breath, stretch: resetsOnActivity implicitly false
+  }
+
+  // ─── ACTIVITY DETECTION STATE ────────────────────────
+  let activityListeners = []
+  let activityDetectionActive = false
+  let activityGraceTimer = null
+  let lastMouseX = null
+  let lastMouseY = null
+  let lastTouchX = null
+  let lastTouchY = null
+
+  // ─── THROTTLE UTILITY ────────────────────────────────
+  function throttle(fn, ms) {
+    let last = 0
+    return function (...args) {
+      const now = Date.now()
+      if (now - last >= ms) {
+        last = now
+        fn.apply(this, args)
+      }
+    }
+  }
+
+  // ─── SETUP ACTIVITY DETECTION ────────────────────────
+  function setupActivityDetection(mode) {
+    teardownActivityDetection()
+    const cfg = ACTIVITY_CONFIG[mode]
+    if (!cfg?.resetsOnActivity) return
+
+    // Grace period: don't arm immediately so the state transition
+    // and any residual pointer events don't fire a reset right away.
+    activityGraceTimer = setTimeout(() => {
+      if (appState === 'ACTIVE' && !isPaused) activityDetectionActive = true
+    }, cfg.gracePeriodMs)
+
+    const handleMouseMove = throttle((e) => {
+      if (!activityDetectionActive || isPaused) return
+      const dx = lastMouseX !== null ? Math.abs(e.clientX - lastMouseX) : 0
+      const dy = lastMouseY !== null ? Math.abs(e.clientY - lastMouseY) : 0
+      lastMouseX = e.clientX
+      lastMouseY = e.clientY
+      if (Math.sqrt(dx * dx + dy * dy) >= cfg.movementThreshold) {
+        triggerActivityReset(mode)
+      }
+    }, 150)
+
+    const handleKeyDown = (e) => {
+      if (!activityDetectionActive || isPaused) return
+      // Ignore lone modifier keys and navigation keys — these are common
+      // incidental presses that don't indicate "back at work" intent.
+      const passThrough = ['Shift','Control','Alt','Meta','Tab','Escape',
+                           'CapsLock','F1','F2','F3','F4','F5','F6',
+                           'F7','F8','F9','F10','F11','F12']
+      if (passThrough.includes(e.key)) return
+      triggerActivityReset(mode)
+    }
+
+    const handleClick = (e) => {
+      if (!activityDetectionActive || isPaused) return
+      // Ignore clicks on our own in-session UI controls — user is
+      // intentionally interacting with the session, not resuming work.
+      if (e.target.closest('#state-ACTIVE button, #exit-modal, #history-strip')) return
+      triggerActivityReset(mode)
+    }
+
+    const handleScroll = (e) => {
+      if (!activityDetectionActive || isPaused) return
+      if (e.target.closest('#history-strip')) return
+      triggerActivityReset(mode)
+    }
+
+    const handleTouchMove = throttle((e) => {
+      if (!activityDetectionActive || isPaused) return
+      const touch = e.touches[0]
+      const dx = lastTouchX !== null ? Math.abs(touch.clientX - lastTouchX) : 0
+      const dy = lastTouchY !== null ? Math.abs(touch.clientY - lastTouchY) : 0
+      lastTouchX = touch.clientX
+      lastTouchY = touch.clientY
+      if (Math.sqrt(dx * dx + dy * dy) >= cfg.movementThreshold) {
+        triggerActivityReset(mode)
+      }
+    }, 150)
+
+    document.addEventListener('mousemove', handleMouseMove, { passive: true })
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('click', handleClick)
+    document.addEventListener('scroll', handleScroll, { passive: true })
+    document.addEventListener('touchmove', handleTouchMove, { passive: true })
+
+    activityListeners = [
+      { type: 'mousemove', handler: handleMouseMove },
+      { type: 'keydown',   handler: handleKeyDown },
+      { type: 'click',     handler: handleClick },
+      { type: 'scroll',    handler: handleScroll },
+      { type: 'touchmove', handler: handleTouchMove }
+    ]
+  }
+
+  // ─── TEARDOWN ACTIVITY DETECTION ─────────────────────
+  function teardownActivityDetection() {
+    activityDetectionActive = false
+    clearTimeout(activityGraceTimer)
+    activityListeners.forEach(({ type, handler }) => {
+      document.removeEventListener(type, handler)
+    })
+    activityListeners = []
+    lastMouseX = null
+    lastMouseY = null
+    lastTouchX = null
+    lastTouchY = null
+  }
+
+  // ─── TRIGGER ACTIVITY RESET ──────────────────────────
+  function triggerActivityReset(mode) {
+    if (appState !== 'ACTIVE' || isPaused) return
+
+    // Disarm immediately to prevent double-triggering
+    activityDetectionActive = false
+    clearInterval(timerInterval)
+
+    // Reset phrase cycling for quiet mode
+    if (mode === 'quiet') {
+      clearInterval(quietInterval)
+      quietInterval = null
+      quietPhraseIndex = 0
+      const phraseEl = document.getElementById('quiet-phrase')
+      phraseEl.style.opacity = '0'
+      setTimeout(() => {
+        phraseEl.textContent = quietPhrases[0]
+        phraseEl.style.opacity = '1'
+      }, 400)
+    }
+
+    // Reset timer state
+    remaining = session.duration
+    session.elapsed = 0
+    ariaAnnounceCounter = 0
+
+    // Snap progress bar back to full without animation
+    const fill = document.getElementById('progress-fill')
+    fill.style.transition = 'none'
+    fill.style.width = '100%'
+    updateTimerDisplay(remaining)
+
+    // Show subtle feedback
+    showActivityToast('Activity detected — pause restarted')
+
+    // Restart timer after a short beat so the user can see the toast
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        document.getElementById('progress-fill').style.transition = 'width 1s linear'
+      })
+
+      if (mode === 'quiet') startQuietMode()
+
+      timerInterval = setInterval(() => {
+        remaining--
+        session.elapsed++
+        updateTimerDisplay(remaining)
+        updateProgressBar(remaining, timerTotal)
+        if (session.mode === 'eye') updateEyeStep()
+        if (session.mode === 'stretch') updateStretchPrompt()
+        ariaAnnounceCounter++
+        if (ariaAnnounceCounter >= 30) {
+          ariaAnnounceCounter = 0
+          document.getElementById('timer-display').setAttribute('aria-label', 'Time remaining: ' + formatTimer(remaining))
+        }
+        if (remaining <= 0) { clearInterval(timerInterval); handleSessionComplete() }
+      }, 1000)
+
+      // Re-arm detection after another grace period
+      activityGraceTimer = setTimeout(() => {
+        if (appState === 'ACTIVE' && !isPaused) activityDetectionActive = true
+      }, ACTIVITY_CONFIG[mode].gracePeriodMs)
+    }, 600)
+  }
+
+  // ─── ACTIVITY TOAST ──────────────────────────────────
+  function showActivityToast(msg) {
+    const toast = document.getElementById('activity-toast')
+    toast.textContent = msg
+    toast.classList.add('visible')
+    setTimeout(() => toast.classList.remove('visible'), 3000)
+  }
+
+  // ─── MODE ICONS (small, inline SVG) ──────────────────
+  function getModeIconSVG(mode, size = 20) {
+    const icons = {
+      quiet: `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <line x1="4" y1="7" x2="16" y2="7" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="4" y1="10" x2="16" y2="10" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="4" y1="13" x2="16" y2="13" stroke="rgba(200,180,240,.7)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>`,
+      eye: `<svg width="${size}" height="${Math.round(size*0.7)}" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+        <path d="M1 7 C4 2, 16 2, 19 7 C16 12, 4 12, 1 7Z" stroke="rgba(140,200,140,.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="10" cy="7" r="2.5" stroke="rgba(140,200,140,.7)" stroke-width="1.5"/>
+      </svg>`,
+      breath: `<svg width="${size}" height="${Math.round(size*0.7)}" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+        <path d="M1 10 Q5 2, 10 7 Q15 12, 19 4" stroke="rgba(120,160,200,.7)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>`,
+      stretch: `<svg width="${Math.round(size*0.8)}" height="${size}" viewBox="0 0 16 20" fill="none" aria-hidden="true">
+        <line x1="8" y1="18" x2="8" y2="6" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="4" y1="10" x2="12" y2="10" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="8" y1="6" x2="5" y2="2" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="8" y1="6" x2="11" y2="2" stroke="rgba(200,160,100,.7)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>`
+    }
+    return icons[mode] || ''
+  }
+
+  // ─── SELECT MODE (WELCOME → MODE_SELECT) ─────────────
+  let selectedMode = null
+  let selectedDuration = null
+
+  function selectMode(mode) {
+    selectedMode = mode
+    const cfg = MODES[mode]
+
+    // Icon
+    const msIcon = document.getElementById('ms-icon')
+    msIcon.style.background = cfg.iconBg
+    msIcon.innerHTML = getModeIconSVG(mode, 24)
+
+    // Name & description
+    document.getElementById('ms-name').textContent = cfg.name
+    document.getElementById('ms-desc').textContent = cfg.desc
+
+    // Duration pills
+    const pillsEl = document.getElementById('duration-pills')
+    pillsEl.innerHTML = ''
+    cfg.durations.forEach((d, i) => {
+      const btn = document.createElement('button')
+      btn.className = 'btn btn-secondary' + (i === 0 ? ' active' : '')
+      btn.textContent = d.label
+      btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false')
+      btn.dataset.secs = d.secs
+      btn.onclick = () => {
+        pillsEl.querySelectorAll('.btn').forEach(b => {
+          b.classList.remove('active')
+          b.setAttribute('aria-pressed', 'false')
+        })
+        btn.classList.add('active')
+        btn.setAttribute('aria-pressed', 'true')
+        selectedDuration = d.secs
+      }
+      pillsEl.appendChild(btn)
+    })
+    selectedDuration = cfg.durations[0].secs
+
+    // What to expect
+    const expectEl = document.getElementById('expect-list')
+    expectEl.innerHTML = ''
+    cfg.expect.forEach(line => {
+      const li = document.createElement('li')
+      li.className = 'expect-item'
+      li.textContent = line
+      expectEl.appendChild(li)
+    })
+
+    setState('MODE_SELECT')
+  }
+
+  // ─── BEGIN SESSION ───────────────────────────────────
+  function beginSession() {
+    session.mode = selectedMode
+    session.duration = selectedDuration
+    session.elapsed = 0
+    session.breathCycles = 0
+
+    // Set session label
+    const m = MODES[selectedMode]
+    const durLabel = m.durations.find(d => d.secs === selectedDuration)?.label || formatTimer(selectedDuration)
+    document.getElementById('active-session-id').textContent = m.name + ' · ' + durLabel
+    document.getElementById('active-session-id').setAttribute('aria-label', m.name + ', ' + durLabel)
+
+    // Show mode glow
+    const glow = document.getElementById('mode-glow')
+    glow.className = 'active-mode-glow glow-' + selectedMode
+
+    // Show correct mode content
+    ;['quiet','eye','breath','stretch'].forEach(md => {
+      document.getElementById('mode-' + md).classList.add('hidden')
+    })
+    document.getElementById('mode-' + selectedMode).classList.remove('hidden')
+
+    // Prepare progress
+    document.getElementById('progress-fill').style.width = '100%'
+    document.getElementById('progress-fill').style.transition = 'none'
+
+    // Show or hide activity-reset notice depending on mode
+    const actNote = document.getElementById('activity-note')
+    const actCfg = ACTIVITY_CONFIG[selectedMode]
+    if (actCfg?.resetsOnActivity) {
+      actNote.textContent = actCfg.note
+      actNote.classList.remove('hidden')
+    } else {
+      actNote.classList.add('hidden')
+    }
+
+    setState('ACTIVE', { onEnter: startTimer })
+  }
+
+  // ─── TIMER ENGINE ────────────────────────────────────
+  let timerInterval = null
+  let remaining = 0
+  let isPaused = false
+  let timerTotal = 0
+  let ariaAnnounceCounter = 0
+
+  function startTimer() {
+    remaining = session.duration
+    timerTotal = session.duration
+    isPaused = false
+
+    updateTimerDisplay(remaining)
+    updateProgressBar(remaining, timerTotal)
+
+    // Mode-specific setup
+    if (session.mode === 'quiet') startQuietMode()
+    if (session.mode === 'eye') updateEyeStep()
+    if (session.mode === 'breath') startBreathCycle()
+    if (session.mode === 'stretch') updateStretchPrompt()
+
+    // Arm activity detection (mode-aware — only quiet uses it)
+    setupActivityDetection(session.mode)
+
+    requestAnimationFrame(() => {
+      document.getElementById('progress-fill').style.transition = 'width 1s linear'
+    })
+
+    timerInterval = setInterval(() => {
+      remaining--
+      session.elapsed++
+      updateTimerDisplay(remaining)
+      updateProgressBar(remaining, timerTotal)
+
+      // Mode updates
+      if (session.mode === 'eye') updateEyeStep()
+      if (session.mode === 'stretch') updateStretchPrompt()
+
+      // Aria announce every 30s
+      ariaAnnounceCounter++
+      if (ariaAnnounceCounter >= 30) {
+        ariaAnnounceCounter = 0
+        // timer display is aria-live polite, update attr forces re-announce
+        document.getElementById('timer-display').setAttribute('aria-label', 'Time remaining: ' + formatTimer(remaining))
+      }
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval)
+        handleSessionComplete()
+      }
+    }, 1000)
+  }
+
+  function updateTimerDisplay(secs) {
+    document.getElementById('timer-display').textContent = formatTimer(secs)
+  }
+
+  function updateProgressBar(rem, total) {
+    const pct = total > 0 ? (rem / total) * 100 : 0
+    document.getElementById('progress-fill').style.width = pct + '%'
+  }
+
+  function formatTimer(seconds) {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m}:${s.toString().padStart(2, '0')}`
+  }
+
+  function togglePause() {
+    const btn = document.getElementById('btn-pause')
+    const overlay = document.getElementById('pause-overlay')
+
+    if (!isPaused) {
+      clearInterval(timerInterval)
+      isPaused = true
+      btn.textContent = 'Resume'
+      btn.setAttribute('aria-pressed', 'true')
+      overlay.classList.add('visible')
+      overlay.removeAttribute('aria-hidden')
+    } else {
+      isPaused = false
+      btn.textContent = 'Pause'
+      btn.setAttribute('aria-pressed', 'false')
+      overlay.classList.remove('visible')
+      overlay.setAttribute('aria-hidden', 'true')
+
+      // Restore activity detection when resuming from pause
+      if (ACTIVITY_CONFIG[session.mode]?.resetsOnActivity) {
+        activityDetectionActive = true
+      }
+
+      timerInterval = setInterval(() => {
+        remaining--
+        session.elapsed++
+        updateTimerDisplay(remaining)
+        updateProgressBar(remaining, timerTotal)
+
+        if (session.mode === 'eye') updateEyeStep()
+        if (session.mode === 'stretch') updateStretchPrompt()
+
+        if (remaining <= 0) {
+          clearInterval(timerInterval)
+          handleSessionComplete()
+        }
+      }, 1000)
+    }
+  }
+
+  // ─── EXIT FLOW ───────────────────────────────────────
+  let exitModalPreviouslyFocused = null
+
+  function promptExit() {
+    if (!isPaused) {
+      clearInterval(timerInterval)
+    }
+    // Suppress activity detection while the exit modal is open
+    activityDetectionActive = false
+    exitModalPreviouslyFocused = document.activeElement
+    const modal = document.getElementById('exit-modal')
+    modal.classList.remove('hidden')
+    modal.querySelector('.btn-primary').focus()
+
+    // Trap focus
+    modal.addEventListener('keydown', trapFocusInModal)
+  }
+
+  function trapFocusInModal(e) {
+    if (e.key === 'Escape') { dismissExitModal(); return }
+    const focusable = document.getElementById('exit-modal').querySelectorAll('button')
+    const first = focusable[0]
+    const last = focusable[focusable.length - 1]
+    if (e.key === 'Tab') {
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
+  }
+
+  function dismissExitModal() {
+    const modal = document.getElementById('exit-modal')
+    modal.classList.add('hidden')
+    modal.removeEventListener('keydown', trapFocusInModal)
+    if (exitModalPreviouslyFocused) exitModalPreviouslyFocused.focus()
+
+    // Resume timer if not paused
+    if (!isPaused && remaining > 0) {
+      // Restore activity detection if this mode uses it
+      if (ACTIVITY_CONFIG[session.mode]?.resetsOnActivity) {
+        activityDetectionActive = true
+      }
+      timerInterval = setInterval(() => {
+        remaining--
+        session.elapsed++
+        updateTimerDisplay(remaining)
+        updateProgressBar(remaining, timerTotal)
+        if (session.mode === 'eye') updateEyeStep()
+        if (session.mode === 'stretch') updateStretchPrompt()
+        if (remaining <= 0) { clearInterval(timerInterval); handleSessionComplete() }
+      }, 1000)
+    }
+  }
+
+  function endSessionEarly() {
+    clearInterval(timerInterval)
+    teardownActivityDetection()
+    document.getElementById('exit-modal').classList.add('hidden')
+    document.getElementById('exit-modal').removeEventListener('keydown', trapFocusInModal)
+    document.getElementById('mode-glow').className = 'active-mode-glow'
+
+    session.history.push({
+      mode: session.mode,
+      duration: session.elapsed,
+      completedAt: new Date(),
+      intention: '',
+      partial: true
+    })
+    updateHistoryStrip()
+    showCompleteState(true)
+  }
+
+  // ─── SESSION COMPLETE ────────────────────────────────
+  function handleSessionComplete() {
+    clearInterval(timerInterval)
+    stopBreathCycle()
+    teardownActivityDetection()
+    document.getElementById('mode-glow').className = 'active-mode-glow'
+
+    session.history.push({
+      mode: session.mode,
+      duration: session.duration,
+      completedAt: new Date(),
+      intention: '',
+      breathCycles: session.breathCycles
+    })
+    updateHistoryStrip()
+    showCompleteState(false)
+  }
+
+  function showCompleteState(partial) {
+    const mode = session.mode
+    const m = MODES[mode]
+    const durLabel = m.durations.find(d => d.secs === session.duration)?.label || formatTimer(session.duration)
+
+    let message
+    if (partial) {
+      message = 'Session ended early.'
+    } else {
+      if (mode === 'quiet') message = 'You took a pause. That was the right choice.'
+      else if (mode === 'eye') message = 'Your eyes have rested. Return when ready.'
+      else if (mode === 'breath') {
+        const cycles = session.breathCycles
+        message = `${cycles} breath cycle${cycles !== 1 ? 's' : ''}. A little more oxygen in the room.`
+      }
+      else if (mode === 'stretch') message = 'Your body moved. The rest of the work can wait.'
+    }
+
+    document.getElementById('complete-message').textContent = message
+    document.getElementById('complete-recap').textContent = m.name + ' · ' + durLabel
+
+    setState('COMPLETE', {
+      onEnter: () => {
+        setTimeout(() => {
+          const ring = document.querySelector('.check-ring')
+          const path = document.querySelector('.check-path')
+          ring.classList.add('drawn')
+          path.classList.add('drawn')
+        }, 100)
+      }
+    })
+  }
+
+  function resetAndGoHome() {
+    document.querySelector('.check-ring').classList.remove('drawn')
+    document.querySelector('.check-path').classList.remove('drawn')
+    session.mode = null
+    session.duration = null
+    session.elapsed = 0
+    setState('WELCOME')
+  }
+
+  // ─── REENTRY ─────────────────────────────────────────
+  function confirmIntention() {
+    const input = document.getElementById('intention-input')
+    const val = input.value.trim()
+
+    if (session.history.length > 0) {
+      session.history[session.history.length - 1].intention = val
+    }
+
+    const areaEl = document.getElementById('reentry-intention-area')
+    const confirmEl = document.getElementById('intention-confirmation')
+    const finalText = document.getElementById('intention-final-text')
+    const finalSub = document.getElementById('intention-final-sub')
+
+    areaEl.classList.add('fading')
+    setTimeout(() => {
+      areaEl.style.display = 'none'
+      if (val) {
+        finalText.textContent = '"' + val + '"'
+        finalSub.textContent = 'Keep this in mind.'
+      } else {
+        finalText.textContent = 'Return with a clear head.'
+        finalText.style.color = 'var(--text-secondary)'
+        finalSub.textContent = ''
+      }
+      confirmEl.style.display = 'flex'
+      updateHistoryStrip()
+    }, 300)
+
+    setTimeout(() => {
+      setState('WELCOME')
+      // Reset reentry UI for next time
+      setTimeout(() => {
+        areaEl.style.display = ''
+        areaEl.classList.remove('fading')
+        confirmEl.style.display = 'none'
+        input.value = ''
+        session.mode = null
+        session.duration = null
+        session.elapsed = 0
+        document.querySelector('.check-ring').classList.remove('drawn')
+        document.querySelector('.check-path').classList.remove('drawn')
+      }, 500)
+    }, 2500)
+  }
+
+  // ─── QUIET MODE ───────────────────────────────────────
+  const quietPhrases = [
+    'Step away from the screen.',
+    'Let your thoughts settle.',
+    'Nothing is required of you right now.',
+    'Breathe. Be somewhere else for a moment.',
+    'Come back when the timer ends.'
+  ]
+  let quietPhraseIndex = 0
+  let quietInterval = null
+
+  function startQuietMode() {
+    quietPhraseIndex = 0
+    const el = document.getElementById('quiet-phrase')
+    el.textContent = quietPhrases[0]
+    el.style.opacity = '1'
+
+    quietInterval = setInterval(() => {
+      const el = document.getElementById('quiet-phrase')
+      el.style.opacity = '0'
+      setTimeout(() => {
+        quietPhraseIndex = (quietPhraseIndex + 1) % quietPhrases.length
+        el.textContent = quietPhrases[quietPhraseIndex]
+        el.style.opacity = '1'
+      }, 600)
+    }, 30000)
+  }
+
+  // ─── EYE MODE ────────────────────────────────────────
+  const eyeSteps = [
+    { title: 'Look away from this screen.', sub: 'Find something at least 6 metres away.' },
+    { title: 'Blink slowly, several times.', sub: 'Let your eyes relax.' },
+    { title: 'Soften your gaze.', sub: 'Let your vision blur slightly.' },
+    { title: 'Almost done.', sub: 'Begin looking toward your screen.' }
+  ]
+
+  let lastEyeStep = -1
+
+  function updateEyeStep() {
+    const progress = 1 - (remaining / timerTotal)
+    let step
+    if (progress < 0.2) step = 0
+    else if (progress < 0.5) step = 1
+    else if (progress < 0.8) step = 2
+    else step = 3
+
+    if (step === lastEyeStep) return
+    lastEyeStep = step
+
+    document.getElementById('eye-step-title').textContent = eyeSteps[step].title
+    document.getElementById('eye-step-sub').textContent = eyeSteps[step].sub
+
+    const eyeSvgG = document.querySelector('#eye-svg g.eye-lid')
+    if (step === 1) {
+      eyeSvgG.style.animation = 'slowBlink 4s ease-in-out infinite'
+    } else if (step === 2) {
+      eyeSvgG.style.animation = 'none'
+      eyeSvgG.style.transform = 'scaleY(0.7)'
+    } else {
+      eyeSvgG.style.animation = 'none'
+      eyeSvgG.style.transform = 'scaleY(1)'
+    }
+  }
+
+  // ─── BREATH MODE ─────────────────────────────────────
+  let breathTimeout1 = null
+  let breathTimeout2 = null
+  let breathTimeout3 = null
+  let breathRunning = false
+
+  function startBreathCycle() {
+    breathRunning = true
+    session.breathCycles = 0
+    const totalCycles = Math.ceil(session.duration / 11)
+    runBreathCycle(totalCycles)
+  }
+
+  function stopBreathCycle() {
+    breathRunning = false
+    clearTimeout(breathTimeout1)
+    clearTimeout(breathTimeout2)
+    clearTimeout(breathTimeout3)
+  }
+
+  function runBreathCycle(totalEstimate) {
+    if (!breathRunning || remaining <= 0) return
+
+    session.breathCycles++
+    const circle = document.getElementById('breath-circle')
+    const label = document.getElementById('breath-label')
+    const cycleEl = document.getElementById('breath-cycle-count')
+    const done = session.breathCycles
+    cycleEl.textContent = `Cycle ${done} of ~${totalEstimate}`
+
+    label.textContent = 'Breathe in'
+    circle.style.animation = 'none'
+    // force reflow
+    void circle.offsetWidth
+    circle.style.animation = 'breatheIn 4s ease-in-out forwards'
+
+    breathTimeout1 = setTimeout(() => {
+      if (!breathRunning) return
+      label.textContent = 'Hold'
+      circle.style.animation = 'none'
+      void circle.offsetWidth
+      circle.style.animation = 'hold 1s ease forwards'
+
+      breathTimeout2 = setTimeout(() => {
+        if (!breathRunning) return
+        label.textContent = 'Breathe out'
+        circle.style.animation = 'none'
+        void circle.offsetWidth
+        circle.style.animation = 'breatheOut 6s ease-in-out forwards'
+
+        breathTimeout3 = setTimeout(() => {
+          if (!breathRunning || remaining <= 0) return
+          runBreathCycle(totalEstimate)
+        }, 6000)
+      }, 1000)
+    }, 4000)
+  }
+
+  // ─── STRETCH MODE ────────────────────────────────────
+  const stretchPrompts = [
+    { text: 'Stand up. Take a moment to feel your weight.', svg: stretchSVG1() },
+    { text: 'Roll your shoulders slowly. Backward, then forward.', svg: stretchSVG2() },
+    { text: 'Tilt your head gently side to side. Hold each side for 3 breaths.', svg: stretchSVG3() },
+    { text: 'Stretch your arms above your head. Feel the length of your spine.', svg: stretchSVG4() },
+    { text: 'Take three long, slow breaths. Then sit back when you\'re ready.', svg: stretchSVG5() }
+  ]
+
+  let lastStretchIdx = -1
+
+  function updateStretchPrompt() {
+    const idx = Math.min(Math.floor(session.elapsed / 60), stretchPrompts.length - 1)
+    if (idx === lastStretchIdx) return
+    lastStretchIdx = idx
+
+    const fig = document.getElementById('stretch-figure')
+    const wrap = document.querySelector('.stretch-text-wrap')
+    const prompt = document.getElementById('stretch-prompt')
+
+    fig.classList.add('fading')
+    wrap.classList.add('fading')
+
+    setTimeout(() => {
+      fig.innerHTML = stretchPrompts[idx].svg
+      prompt.textContent = stretchPrompts[idx].text
+      fig.classList.remove('fading')
+      wrap.classList.remove('fading')
+    }, 600)
+  }
+
+  function stretchSVG1() {
+    // Standing figure upright
+    return `<circle cx="32" cy="10" r="5" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none"/>
+    <line x1="32" y1="15" x2="32" y2="48" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="44" y2="28" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="24" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="40" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>`
+  }
+
+  function stretchSVG2() {
+    // Figure with shoulder arrows
+    return `<circle cx="32" cy="10" r="5" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none"/>
+    <line x1="32" y1="15" x2="32" y2="48" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="44" y2="28" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M16 22 Q10 28 16 34" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <path d="M48 22 Q54 28 48 34" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="24" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="40" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>`
+  }
+
+  function stretchSVG3() {
+    // Figure with tilted head
+    return `<circle cx="36" cy="12" r="5" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none"/>
+    <line x1="32" y1="17" x2="32" y2="48" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="44" y2="28" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="24" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="48" x2="40" y2="66" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>`
+  }
+
+  function stretchSVG4() {
+    // Figure with arms raised
+    return `<circle cx="32" cy="14" r="5" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none"/>
+    <line x1="32" y1="19" x2="32" y2="52" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="32" y2="19" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="44" y1="28" x2="32" y2="19" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="28" x2="14" y2="18" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="44" y1="28" x2="50" y2="18" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="52" x2="24" y2="70" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="52" x2="40" y2="70" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>`
+  }
+
+  function stretchSVG5() {
+    // Seated figure
+    return `<circle cx="32" cy="14" r="5" stroke="var(--text-tertiary)" stroke-width="1.2" fill="none"/>
+    <line x1="32" y1="19" x2="32" y2="44" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="20" y1="30" x2="44" y2="30" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="44" x2="18" y2="44" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="18" y1="44" x2="14" y2="58" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="32" y1="44" x2="38" y2="58" stroke="var(--text-tertiary)" stroke-width="1.2" stroke-linecap="round"/>`
+  }
+
+  // ─── HISTORY STRIP ────────────────────────────────────
+  let historyExpanded = false
+
+  function updateHistoryStrip() {
+    const strip = document.getElementById('history-strip')
+    const dots = document.getElementById('history-dots')
+    const count = document.getElementById('history-count')
+    const expanded = document.getElementById('history-expanded')
+
+    if (session.history.length === 0) {
+      strip.classList.add('hidden')
+      return
+    }
+
+    strip.classList.remove('hidden')
+
+    // Dots
+    dots.innerHTML = ''
+    const recent = session.history.slice(-5)
+    recent.forEach(s => {
+      const dot = document.createElement('div')
+      dot.className = 'history-dot dot-' + s.mode
+      dots.appendChild(dot)
+    })
+
+    // Count
+    const today = new Date()
+    const todaySessions = session.history.filter(s => {
+      const d = new Date(s.completedAt)
+      return d.toDateString() === today.toDateString()
+    })
+    const n = todaySessions.length
+    count.textContent = n + ' session' + (n !== 1 ? 's' : '') + ' today'
+
+    // Expanded cards
+    expanded.innerHTML = ''
+    recent.reverse().forEach(s => {
+      const card = document.createElement('div')
+      card.className = 'history-mini-card'
+      const minAgo = Math.round((Date.now() - new Date(s.completedAt)) / 60000)
+      const timeStr = minAgo < 1 ? 'just now' : minAgo + ' min ago'
+      const dur = formatTimer(s.duration)
+      card.innerHTML = `
+        <div class="history-mini-mode">${MODES[s.mode]?.name ?? s.mode}</div>
+        <div class="history-mini-duration">${dur}</div>
+        <div class="history-mini-time">${timeStr}</div>
+        ${s.intention ? `<div class="history-mini-intention" title="${s.intention}">${s.intention}</div>` : ''}
+      `
+      expanded.appendChild(card)
+    })
+  }
+
+  function toggleHistory(e) {
+    const strip = document.getElementById('history-strip')
+    const toggle = document.getElementById('history-toggle')
+    const expanded = document.getElementById('history-expanded')
+
+    if (!historyExpanded) {
+      strip.classList.add('expanded')
+      toggle.setAttribute('aria-expanded', 'true')
+      expanded.setAttribute('aria-hidden', 'false')
+      historyExpanded = true
+
+      // Close on outside click
+      setTimeout(() => {
+        document.addEventListener('click', closeHistoryOutside)
+      }, 10)
+    } else {
+      collapseHistory()
+    }
+  }
+
+  function expandHistoryStrip() {
+    const strip = document.getElementById('history-strip')
+    if (!strip.classList.contains('hidden') && !historyExpanded) {
+      toggleHistory()
+    }
+  }
+
+  function closeHistoryOutside(e) {
+    const strip = document.getElementById('history-strip')
+    if (!strip.contains(e.target)) {
+      collapseHistory()
+    }
+  }
+
+  function collapseHistory() {
+    const strip = document.getElementById('history-strip')
+    const toggle = document.getElementById('history-toggle')
+    const expanded = document.getElementById('history-expanded')
+    strip.classList.remove('expanded')
+    toggle.setAttribute('aria-expanded', 'false')
+    expanded.setAttribute('aria-hidden', 'true')
+    historyExpanded = false
+    document.removeEventListener('click', closeHistoryOutside)
+  }
+
+  // ─── INIT ─────────────────────────────────────────────
+  // Initialise stretch figure with prompt 0 SVG on load
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('stretch-figure').innerHTML = stretchSVG1()
+    document.getElementById('stretch-prompt').textContent = stretchPrompts[0].text
+  })
+</script>
+</body>
+</html>
