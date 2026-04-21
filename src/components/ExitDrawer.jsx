@@ -18,49 +18,49 @@ export default function ExitDrawer({ remaining, onKeepGoing, onExit }) {
 
   const handleExit = () => {
     setExiting(true)
-    setTimeout(onExit, 320)
+    setTimeout(onExit, 280)
   }
 
   const handleKeep = () => {
     setExiting(true)
-    setTimeout(onKeepGoing, 320)
+    setTimeout(onKeepGoing, 280)
   }
 
   return (
     <div
-      className="drawer-overlay"
+      className={`drawer-overlay${exiting ? ' exiting' : ''}`}
       onClick={(e) => { if (e.target === e.currentTarget) handleKeep() }}
       role="dialog"
       aria-modal="true"
       aria-label="Exit session"
     >
       <div className={`drawer-sheet${exiting ? ' exiting' : ''}`}>
-        <div className="drawer-handle" aria-hidden="true" />
         <h2
           className="font-display"
-          style={{ fontSize: 20, fontWeight: 300, color: 'var(--text-primary)', marginBottom: 10 }}
+          style={{ fontSize: 26, fontWeight: 300, color: 'var(--text-primary)', marginBottom: 10, letterSpacing: '-0.01em' }}
         >
           Leave early?
         </h2>
-        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 24 }}>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.7 }}>
           {body}
         </p>
         <div className="drawer-actions">
           <button
-            className="btn btn-primary"
-            onClick={handleKeep}
-            style={{ flex: 2 }}
-            data-no-reset
-          >
-            Keep going
-          </button>
-          <button
-            className="btn btn-danger btn-ghost"
+            className="btn btn-ghost btn-danger"
             onClick={handleExit}
-            style={{ flex: 1 }}
             data-no-reset
+            style={{ justifyContent: 'center' }}
           >
             Exit anyway
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={handleKeep}
+            data-no-reset
+            style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.14)' }}
+            autoFocus
+          >
+            Keep going
           </button>
         </div>
       </div>

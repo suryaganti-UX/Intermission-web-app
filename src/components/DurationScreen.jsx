@@ -33,7 +33,7 @@ export default function DurationScreen({ breakId, onStart, onBack }) {
   const accentGlow = `rgba(${b.accentRgb},0.08)`
 
   return (
-    <div className="screen-wrap screen-enter">
+    <div className="screen-wrap screen-wrap--top screen-enter">
       <div className="screen-inner" role="main">
 
         {/* Back + type badge */}
@@ -115,7 +115,7 @@ export default function DurationScreen({ breakId, onStart, onBack }) {
             return (
               <div
                 key={i}
-                className="glass-card duration-card"
+                className="duration-card"
                 role="radio"
                 aria-checked={isSelected}
                 tabIndex={0}
@@ -125,8 +125,6 @@ export default function DurationScreen({ breakId, onStart, onBack }) {
                   borderColor: isSelected ? b.accent : isRecommended ? accentBorder : undefined,
                   background: isSelected ? accentRgba : isRecommended ? accentGlow : undefined,
                   boxShadow: isRecommended ? `0 0 20px ${accentGlow}` : undefined,
-                  '--accent': b.accent,
-                  '--accent-dim': accentRgba,
                 }}
               >
                 <div
@@ -147,16 +145,13 @@ export default function DurationScreen({ breakId, onStart, onBack }) {
           })}
         </div>
 
-        {/* Begin button */}
+        {/* Begin button — bold accent fill for clear contrast */}
         <button
-          className="btn btn-full stagger-item"
+          className="btn btn-full btn-begin stagger-item"
           style={{
-            background: accentRgba,
-            borderColor: accentBorder,
+            '--btn-begin-bg': `rgba(${b.accentRgb}, 0.32)`,
+            '--btn-begin-border': `rgba(${b.accentRgb}, 0.6)`,
             color: 'var(--text-primary)',
-            fontSize: 15,
-            fontWeight: 400,
-            padding: '16px',
           }}
           onClick={() => onStart(b.durations[selectedIdx].value)}
         >

@@ -91,6 +91,21 @@ body {
   background: rgba(167,139,250,0.22);
   border-color: rgba(167,139,250,0.5);
 }
+/* Begin button: uses the break's accent via inline style, this class ensures
+   strong contrast regardless of the accent hue */
+.btn-begin {
+  font-size: 15px;
+  font-weight: 400;
+  padding: 16px;
+  letter-spacing: 0.02em;
+  /* Ensure a minimum visible background even for low-contrast accents */
+  background: var(--btn-begin-bg, rgba(255,255,255,0.10));
+  border-color: var(--btn-begin-border, rgba(255,255,255,0.20));
+}
+.btn-begin:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
 .btn-ghost {
   background: transparent;
   border: none;
@@ -221,6 +236,11 @@ body {
   padding: 40px 20px 80px;
   position: relative;
 }
+/* History and other content-heavy screens sit near the top */
+.screen-wrap--top {
+  justify-content: flex-start;
+  padding-top: 80px;
+}
 .screen-inner {
   width: 100%;
   max-width: 420px;
@@ -289,9 +309,11 @@ body {
 .break-card-meta {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
+  min-width: 52px;
+  text-align: center;
 }
 .break-card-dur { font-size: 11px; color: var(--text-muted); }
 .break-card-arrow {
@@ -350,6 +372,9 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  /* Unselected tiles need visible presence */
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
 }
 .duration-card:hover { border-color: var(--border-hover); background: var(--surface-hover); }
 .duration-card.selected {
@@ -489,42 +514,55 @@ body {
   transition: width 3s linear;
 }
 
-/* ─── EXIT DRAWER ────────────────────────────────────── */
-@keyframes drawerSlideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+/* ─── EXIT MODAL ─────────────────────────────────────── */
+@keyframes modalIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
-@keyframes drawerSlideDown {
-  to { transform: translateY(100%); }
+@keyframes modalOut {
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
 }
+@keyframes overlayIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlayOut { to   { opacity: 0; } }
+
 .drawer-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 150;
-  display: flex;
-  align-items: flex-end;
+  animation: overlayIn 280ms ease forwards;
+}
+.drawer-overlay.exiting {
+  animation: overlayOut 280ms ease forwards;
 }
 .drawer-sheet {
-  width: 100%;
-  background: rgba(12,12,24,0.95);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border-top: 1px solid var(--border);
-  border-radius: 20px 20px 0 0;
-  padding: 16px 24px 40px;
-  animation: drawerSlideUp 400ms var(--ease-spring) forwards;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(440px, calc(100vw - 40px));
+  background: rgba(14,14,28,0.96);
+  backdrop-filter: blur(48px);
+  -webkit-backdrop-filter: blur(48px);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px;
+  padding: 36px 32px 32px;
+  animation: modalIn 380ms var(--ease-spring) forwards;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 0.5px rgba(255,255,255,0.06) inset;
 }
 .drawer-sheet.exiting {
-  animation: drawerSlideDown 300ms ease forwards;
+  animation: modalOut 260ms ease forwards;
 }
-.drawer-handle {
-  width: 36px; height: 4px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.1);
-  margin: 0 auto 20px;
+/* Hide old handle — not needed in modal */
+.drawer-handle { display: none; }
+.drawer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 28px;
 }
-.drawer-actions { display: flex; gap: 10px; }
 
 /* ─── REFLECTION SCREEN ──────────────────────────────── */
 .reflection-textarea {

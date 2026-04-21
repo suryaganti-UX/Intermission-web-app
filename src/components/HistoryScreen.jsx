@@ -39,7 +39,7 @@ export default function HistoryScreen({ onBack }) {
   }, [allSessions])
 
   return (
-    <div className="screen-wrap screen-enter">
+    <div className="screen-wrap screen-wrap--top screen-enter">
       <div className="screen-inner screen-inner-wide" role="main">
 
         {/* Header */}

@@ -2,6 +2,40 @@ import { useEffect, useCallback } from 'react'
 import { BREAKS, BREAK_ORDER } from '../config/breaks'
 import StreakBar from './StreakBar'
 
+// Refined SVG line icons — same metaphor as the original emojis, editorial weight
+const BREAK_ICONS = {
+  quiet: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" aria-hidden="true">
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/>
+      <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+      <line x1="9" y1="9" x2="9.01" y2="9"/>
+      <line x1="15" y1="9" x2="15.01" y2="9"/>
+    </svg>
+  ),
+  eye: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  ),
+  breath: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" aria-hidden="true">
+      <path d="M12 22V12"/>
+      <path d="M12 12C12 8.686 9.314 6 6 6a6 6 0 0 0 0 12c2.21 0 4-1.79 4-4"/>
+      <path d="M12 12c0-3.314 2.686-6 6-6a6 6 0 0 1 0 12c-2.21 0-4-1.79-4-4"/>
+    </svg>
+  ),
+  stretch: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" width="22" height="22" aria-hidden="true">
+      <circle cx="12" cy="4" r="1.5"/>
+      <path d="M12 7v5l-3 4"/>
+      <path d="M12 12l3 4"/>
+      <path d="M9 11H6"/>
+      <path d="M18 11h-3"/>
+    </svg>
+  ),
+}
+
 export default function HomeScreen({ onSelect, onHistory, streakKey }) {
   // Keyboard shortcuts: 1/2/3/4
   const handleKeyDown = useCallback((e) => {
@@ -44,6 +78,7 @@ export default function HomeScreen({ onSelect, onHistory, streakKey }) {
             return (
               <BreakCard
                 key={id}
+                breakId={id}
                 breakDef={b}
                 index={idx}
                 onSelect={() => onSelect(id)}
@@ -70,7 +105,7 @@ export default function HomeScreen({ onSelect, onHistory, streakKey }) {
   )
 }
 
-function BreakCard({ breakDef: b, index, onSelect }) {
+function BreakCard({ breakId, breakDef: b, index, onSelect }) {
   const accentRgba = `rgba(${b.accentRgb},0.14)`
   const accentBorder = `rgba(${b.accentRgb},0.28)`
 
@@ -96,10 +131,10 @@ function BreakCard({ breakDef: b, index, onSelect }) {
     >
       <div
         className="break-card-icon"
-        style={{ background: accentRgba, border: `1px solid ${accentBorder}` }}
+        style={{ background: accentRgba, border: `1px solid ${accentBorder}`, color: b.accent }}
         aria-hidden="true"
       >
-        {b.emoji}
+        {BREAK_ICONS[breakId] ?? b.emoji}
       </div>
 
       <div className="break-card-body">
@@ -112,22 +147,7 @@ function BreakCard({ breakDef: b, index, onSelect }) {
         <span className="break-card-arrow" style={{ color: 'var(--text-muted)', transition: 'color 200ms ease' }}>›</span>
       </div>
 
-      {/* Keyboard shortcut hint */}
-      <span
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          right: 52,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          fontSize: 10,
-          color: 'var(--text-muted)',
-          opacity: 0.5,
-          letterSpacing: '0.06em',
-        }}
-      >
-        {index + 1}
-      </span>
+      {/* Keyboard shortcut hint removed — meta centered instead */}
     </div>
   )
 }

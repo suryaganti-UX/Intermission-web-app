@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { BREAKS } from '../config/breaks'
 import { useTimer } from '../hooks/useTimer'
 import { useCursorActivity } from '../hooks/useCursorActivity'
+import useSessionAudio from '../hooks/useSessionAudio'
 import CursorWarning from './CursorWarning'
 import ExitDrawer from './ExitDrawer'
 
@@ -31,6 +32,20 @@ export default function SessionScreen({ breakId, duration, onComplete, onExit })
   const [breathTransition, setBreathTransition] = useState('4s ease-in-out')
   const breathTimer = useRef(null)
   const breathCycleRef = useRef(0)
+
+  // ── Beat-pulse orb effect (stretch mode) ─────────────
+  const [beatPulse, setBeatPulse] = useState(false)
+  const handleBeat = useCallback(() => {
+    setBeatPulse(true)
+    setTimeout(() => setBeatPulse(false), 180)
+  }, [])
+
+  // ── Audio engine ──────────────────────────────────────
+  const { isMuted, toggleMute } = useSessionAudio(breakId, {
+    paused,
+    enabled: !isComplete,
+    onBeat: breakId === 'stretch' ? handleBeat : undefined,
+  })
 
   // ── Prompt rotation ───────────────────────────────────
   const [promptIdx, setPromptIdx] = useState(0)
@@ -192,9 +207,10 @@ export default function SessionScreen({ breakId, duration, onComplete, onExit })
 
   // Orb core background
   const orbBg = `radial-gradient(circle, rgba(${accentRgb},0.35) 0%, rgba(${accentRgb},0.12) 40%, var(--bg) 100%)`
+  const beatBoost = beatPulse ? 24 : 0
   const orbGlow = orbFullGlow
     ? `0 0 80px rgba(${accentRgb},0.6), 0 0 40px rgba(${accentRgb},0.4)`
-    : `0 0 ${40 + Math.round(progress * 40)}px rgba(${accentRgb},0.3)`
+    : `0 0 ${40 + Math.round(progress * 40) + beatBoost}px rgba(${accentRgb},${beatPulse ? 0.55 : 0.3})`
 
   // Timer copy
   const timerText = remaining <= 30
@@ -327,6 +343,17 @@ export default function SessionScreen({ breakId, duration, onComplete, onExit })
             data-no-reset
           >
             {paused ? 'Resume' : 'Pause'}
+          </button>
+          <button
+            className="btn btn-ghost"
+            onClick={toggleMute}
+            aria-pressed={isMuted}
+            aria-label={isMuted ? 'Unmute audio' : 'Mute audio'}
+            data-no-reset
+            title={isMuted ? 'Unmute' : 'Mute'}
+            style={{ padding: '10px 14px', fontSize: 16, minWidth: 44 }}
+          >
+            {isMuted ? '🔇' : '🔊'}
           </button>
           <button
             className="btn btn-ghost btn-danger"

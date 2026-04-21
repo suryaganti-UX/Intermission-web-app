@@ -29,8 +29,11 @@ export default function StreakBar({ refreshKey }) {
             ))}
           </div>
         </div>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-          {todayBreaks} {todayBreaks === 1 ? 'break' : 'breaks'}
+        <span style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'right', lineHeight: 1.4 }}>
+          {todayBreaks}<br />
+          <span style={{ fontSize: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            {todayBreaks === 1 ? 'break' : 'breaks'}
+          </span>
         </span>
       </div>
 
