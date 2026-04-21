@@ -8,6 +8,12 @@ export const BREAKS = {
     trigger: "When your mind won't stop",
     durationRange: '2–5 min',
     subtitle: 'Step away. Let your thoughts settle.',
+    celebration: {
+      headline: 'Mind, cleared.',
+      subline: 'The noise paused. That silence was yours.',
+      nudge: 'Stillness is a skill. You just practised it.',
+      tryNext: 'Your eyes could use a break next.',
+    },
     durations: [
       { value: 120, label: '2', unit: 'min', desc: 'Quick reset' },
       { value: 180, label: '3', unit: 'min', desc: 'Short pause' },
@@ -33,6 +39,12 @@ export const BREAKS = {
     trigger: 'When your eyes feel strained or dry',
     durationRange: '20s – 2 min',
     subtitle: 'Rest your focal muscles. Look far away.',
+    celebration: {
+      headline: 'Eyes, refreshed.',
+      subline: 'Your focal muscles got the rest they were asking for.',
+      nudge: 'Every 20 minutes is the goal. You\'re doing it.',
+      tryNext: 'Next — try a breathing reset to follow through.',
+    },
     durations: [
       { value: 20,  label: '20', unit: 'sec', desc: 'Quick blink' },
       { value: 60,  label: '1',  unit: 'min', desc: 'Eye break' },
@@ -58,6 +70,12 @@ export const BREAKS = {
     trigger: 'When you feel anxious or scattered',
     durationRange: '2–5 min',
     subtitle: 'Slow, deliberate. Follow the rhythm.',
+    celebration: {
+      headline: 'Rhythm, restored.',
+      subline: 'You breathed through it — that takes real discipline.',
+      nudge: 'When the next wave comes, you know what to reach for.',
+      tryNext: 'Your body is next — try a stretch to keep going.',
+    },
     durations: [
       { value: 120, label: '2', unit: 'min', desc: 'Box breath' },
       { value: 180, label: '3', unit: 'min', desc: 'Settle in' },
@@ -84,6 +102,12 @@ export const BREAKS = {
     trigger: 'When your body feels stiff or heavy',
     durationRange: '2–5 min',
     subtitle: 'Move. Your body was waiting for this.',
+    celebration: {
+      headline: 'Body, awake.',
+      subline: 'You moved when sitting was easier. That matters.',
+      nudge: 'Your posture and energy are already better for it.',
+      tryNext: 'A quiet pause next would complete the reset.',
+    },
     durations: [
       { value: 120, label: '2', unit: 'min', desc: 'Quick move' },
       { value: 180, label: '3', unit: 'min', desc: 'Short stretch' },

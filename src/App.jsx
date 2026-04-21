@@ -47,20 +47,26 @@ export default function App() {
     setScreen('reflect')
   }, [])
 
-  const submitReflection = useCallback((text) => {
-    setIntention(text)
+  const submitReflection = useCallback(({ mood, intention } = {}) => {
+    const intentionText = typeof intention === 'string' ? intention : ''
+    setIntention(intentionText)
     // Save to localStorage
     saveSession({
       id: Date.now(),
       type: selectedBreak,
       duration: selectedDuration,
       completedAt: new Date().toISOString(),
-      reflection: text,
+      reflection: intentionText,
+      mood: mood ?? null,
       completed: true,
       resetCount: sessionData?.resetCount ?? 0,
     })
-    setScreen('intention')
-  }, [selectedBreak, selectedDuration, sessionData])
+    if (intentionText) {
+      setScreen('intention')
+    } else {
+      goHome()
+    }
+  }, [selectedBreak, selectedDuration, sessionData, goHome])
 
   const skipReflection = useCallback(() => {
     saveSession({
@@ -69,11 +75,16 @@ export default function App() {
       duration: selectedDuration,
       completedAt: new Date().toISOString(),
       reflection: '',
+      mood: null,
       completed: true,
       resetCount: sessionData?.resetCount ?? 0,
     })
     goHome()
   }, [selectedBreak, selectedDuration, sessionData, goHome])
+
+  const tryAnother = useCallback(() => {
+    goHome()
+  }, [goHome])
 
   // ── Screen render ─────────────────────────────────────
   const renderScreen = () => {
@@ -110,6 +121,7 @@ export default function App() {
             sessionData={sessionData}
             onSubmit={submitReflection}
             onSkip={skipReflection}
+            onTryAnother={tryAnother}
           />
         )
       case 'intention':
